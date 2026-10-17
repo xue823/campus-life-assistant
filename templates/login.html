@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>校园生活 AI 助手 · 登录 / 注册</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <div class="brand">
+      <div class="logo">淮</div>
+      <div>
+        <h1>黄淮校园生活助手</h1>
+        <p class="sub">考核安排 · 干饭推荐 · 记账分析 · 同学名单 · 黄淮信息 · 校园问答</p>
+      </div>
+    </div>
+
+    <div class="tabs-switch">
+      <button id="tabLogin" class="on">登录</button>
+      <button id="tabReg">注册</button>
+    </div>
+
+    <!-- 登录 -->
+    <div id="paneLogin">
+      <label class="field">
+        <span>学号</span>
+        <input id="sid" value="20230101" autocomplete="username" placeholder="请输入学号">
+      </label>
+      <label class="field">
+        <span>口令</span>
+        <input id="pwd" type="password" value="123456" autocomplete="current-password" placeholder="请输入口令">
+      </label>
+      <button id="loginBtn" class="primary">进入助手</button>
+      <p id="msg" class="msg"></p>
+      <div class="tips">
+        <p><b>演示账号：</b>20230101 / 123456</p>
+        <p>本项目为课程与竞赛演示作品，数据均为本地演示数据。</p>
+      </div>
+    </div>
+
+    <!-- 注册 -->
+    <div id="paneReg" style="display:none">
+      <label class="field">
+        <span>学号 <em>（6—12 位数字）</em></span>
+        <input id="rSid" placeholder="如 20250101" autocomplete="username">
+      </label>
+      <label class="field">
+        <span>姓名</span>
+        <input id="rName" placeholder="如 李小明">
+      </label>
+      <label class="field">
+        <span>专业</span>
+        <select id="rMajor">
+          <option>计算机科学与技术</option>
+          <option>网络工程</option>
+          <option>软件工程</option>
+          <option>人工智能</option>
+          <option>数据科学与大数据技术</option>
+          <option>其他</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>口令 <em>（至少 6 位）</em></span>
+        <input id="rPwd" type="password" placeholder="设置登录口令">
+      </label>
+      <label class="field">
+        <span>确认口令</span>
+        <input id="rPwd2" type="password" placeholder="再输入一次">
+      </label>
+      <button id="regBtn" class="primary">注册并登录</button>
+      <p id="rMsg" class="msg"></p>
+      <div class="tips">
+        <p>注册后会自动创建示例考核安排与同学名单，记账从零开始。</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (s) => document.querySelector(s);
+    function switchTab(toLogin) {
+      $("#tabLogin").classList.toggle("on", toLogin);
+      $("#tabReg").classList.toggle("on", !toLogin);
+      $("#paneLogin").style.display = toLogin ? "" : "none";
+      $("#paneReg").style.display = toLogin ? "none" : "";
+    }
+    $("#tabLogin").onclick = () => switchTab(true);
+    $("#tabReg").onclick = () => switchTab(false);
+
+    async function post(url, body) {
+      const res = await fetch(url, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      return res.json();
+    }
+
+    $("#loginBtn").onclick = async () => {
+      $("#msg").textContent = "";
+      const data = await post("/api/login", {
+        sid: $("#sid").value.trim(), password: $("#pwd").value
+      });
+      if (data.ok) location.href = "/app";
+      else $("#msg").textContent = data.error || "登录失败";
+    };
+    $("#pwd").onkeydown = (e) => { if (e.key === "Enter") $("#loginBtn").click(); };
+
+    $("#regBtn").onclick = async () => {
+      $("#rMsg").textContent = "";
+      const body = {
+        sid: $("#rSid").value.trim(), name: $("#rName").value.trim(),
+        major: $("#rMajor").value,
+        password: $("#rPwd").value, password2: $("#rPwd2").value,
+      };
+      const data = await post("/api/register", body);
+      if (!data.ok) { $("#rMsg").textContent = data.error || "注册失败"; return; }
+      $("#rMsg").style.color = "#1f8574";
+      $("#rMsg").textContent = "注册成功，正在登录…";
+      const login = await post("/api/login", { sid: body.sid, password: body.password });
+      if (login.ok) location.href = "/app";
+      else switchTab(true);
+    };
+  </script>
+</body>
+</html>
