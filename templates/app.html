@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>校园生活 AI 助手</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="app-body">
+<div class="phone">
+  <header class="topbar">
+    <div class="who">
+      <div class="avatar" id="avatar">李</div>
+      <div>
+        <div class="hello" id="hello">你好，同学</div>
+        <div class="sub" id="subline">正在加载…</div>
+      </div>
+    </div>
+    <button class="ghost" id="logout">退出</button>
+  </header>
+  <main id="view" class="view">
+    <div class="loading">加载中…</div>
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab active" data-tab="schedule"><span>📅</span>课表</button>
+    <button class="tab" data-tab="meals"><span>🍚</span>干饭</button>
+    <button class="tab" data-tab="money"><span>💰</span>记账</button>
+    <button class="tab" data-tab="students"><span>👥</span>同学</button>
+    <button class="tab" data-tab="chat"><span>🤖</span>问答</button>
+    <button class="tab" data-tab="campus"><span>🏫</span>黄淮</button>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
