@@ -71,3 +71,9 @@ python server.py --port 8866      # 需 Python 3.8+，无需 pip 安装任何包
 - 推荐算法完全本地、毫秒级、结果可解释（不是黑盒排序）
 - “离线优先 + 大模型可选增强”的双通道问答架构
 - 零依赖 + 一键启动，任何电脑拷过去双击即可运行，适合现场路演
+
+## 双仓库镜像
+- GitHub（主）：https://github.com/xue823/campus-life-assistant
+- Gitee（备）：https://gitee.com/x17993/campus-life-assistant
+- 封面图直链（国内可用）：https://gitee.com/x17993/campus-life-assistant/raw/master/cover.png
+- GitHub Pages（已启用，部分地区可能访问受限）：https://xue823.github.io/campus-life-assistant/
