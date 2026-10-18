@@ -8,7 +8,7 @@
 支持注册登录与数据增删改，零第三方依赖、离线可运行，双击 `start.bat` 即可演示。
 
 ## 代码仓库
-https://gitee.com/17993/campus-life-assistant
+https://gitee.com/x17993/campus-life-assistant
 （提交前把本目录推上去：`git init && git add . && git commit -m "feat: 黄淮校园生活助手"`）
 
 ## 演示地址
@@ -26,7 +26,7 @@ python server.py --port 8866    # 或 runtime\python\python.exe server.py --port
 > 若已部署到公网，把演示地址栏填成 `http://你的域名:8866/`；演示账号同上。
 
 ## 封面图链接
-https://gitee.com/17993/campus-life-assistant/raw/master/cover.png
+https://gitee.com/x17993/campus-life-assistant/raw/master/cover.png
 （建议用「课表页 + 干饭推荐页 + 黄淮信息页」三拼图做封面，尺寸 1200×800；项目 `screenshots/` 里已有现成截图）
 
 ## 详细说明
@@ -34,7 +34,7 @@ https://gitee.com/17993/campus-life-assistant/raw/master/cover.png
 **技术栈**
 - 后端：Python 3 标准库（`http.server` + `sqlite3`），**零第三方依赖**；Cookie 会话、PBKDF2 口令哈希、参数化 SQL 防注入、老库自动列迁移
 - 前端：原生 JavaScript 单页应用 + 原生 CSS（无框架、无 CDN），桌面端手机外壳、移动端全屏自适应
-- 数据：SQLite 本地库，首次启动自动建表并写入演示数据（计科2502B 考核安排 24 条 / 12 门课 / 27 学分 + 22 道菜 + 12 条校园问答 + 14 天账本 + 5 人同学名单）
+- 数据：SQLite 本地库，首次启动自动建表并写入演示数据（计科2502B 考核安排 24 条 / 12 门课 / 27 学分 + 34 道菜 + 12 条校园问答 + 14 天账本 + 5 人同学名单）
 
 **黄淮学院场景（信息来自学校官网公开页面）**
 - 学校概况：河南省驻马店市开源大道 76 号，18 个二级学院、61 个在招本科专业、占地 2760 亩，校训「厚德、博学、笃行、自强」
@@ -71,9 +71,3 @@ python server.py --port 8866      # 需 Python 3.8+，无需 pip 安装任何包
 - 推荐算法完全本地、毫秒级、结果可解释（不是黑盒排序）
 - “离线优先 + 大模型可选增强”的双通道问答架构
 - 零依赖 + 一键启动，任何电脑拷过去双击即可运行，适合现场路演
-
-## 双仓库镜像
-- GitHub（主）：https://github.com/xue823/campus-life-assistant
-- Gitee（备）：https://gitee.com/x17993/campus-life-assistant
-- 封面图直链（国内可用）：https://gitee.com/x17993/campus-life-assistant/raw/master/cover.png
-- GitHub Pages（已启用，部分地区可能访问受限）：https://xue823.github.io/campus-life-assistant/
