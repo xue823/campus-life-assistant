@@ -1,0 +1,44 @@
+黄淮校园生活助手 · 启动说明
+============================
+
+一、最快方式（推荐）
+  1. 解压整个文件夹（必须保留 runtime 文件夹，它和 start.bat 同级）
+  2. 双击 start.bat
+  3. 浏览器自动打开 http://127.0.0.1:8866/
+  4. 演示账号 20230101 / 口令 123456（也可现场注册新账号）
+  5. 运行期间不要关闭那个黑窗口；关闭窗口 = 停止服务
+
+二、用命令行启动
+  PowerShell（注意前缀 .\ 不能省）：
+      cd C:\Users\17993\Desktop\campus_life
+      .\runtime\python\python.exe server.py
+  或者：
+      .\start.bat
+  cmd：
+      cd /d C:\Users\17993\Desktop\campus_life
+      start.bat
+
+三、让别人也能打开
+  同一 Wi-Fi / 热点：
+      .\runtime\python\python.exe server.py --host 0.0.0.0 --port 8866
+      其他人访问 http://本机IP:8866/
+      （查本机 IP：ipconfig，找“IPv4 地址”）
+  注意：Windows 防火墙可能拦截，需允许 python.exe 通过（专用/公用都勾选）。
+
+四、常见报错
+  “Python was not found”        → 这台电脑没装系统 Python，用 runtime\python\python.exe 或 start.bat
+  “不是内部或外部命令”          → 你在 cmd 里敲了 PowerShell 命令；cmd 用 rmdir /s /q，PowerShell 用 Remove-Item
+  “无法将 Python: 项识别为…”     → 你把程序打印的日志当命令输入了，那些是输出不是命令
+  “端口被占用 / 10048”          → 已经开了一个实例，关掉旧窗口，或换 --port 8877
+  “找不到路径 campus-life-assistant” → 目录名是 campus_life，以实际解压出来的名字为准
+
+五、停止服务
+  在那个黑窗口按 Ctrl + C，或直接关掉窗口。
+
+六、答辩演示建议顺序（约 6 分钟）
+  1. 课表：讲“本周过滤单双周”和“下一场倒计时”，现场改一条、删一条
+  2. 干饭：讲当前时段判断和推荐理由，切换口味/预算看结果变化
+  3. 记账：现场加一笔 13.5 元，看今日金额与柱状图立刻变化，再删掉
+  4. 同学：新增一位同学，再改、再删
+  5. 黄淮：展示 10 个官方入口与校园网认证说明
+  6. 问答：问“校园网连不上怎么办”，再清空历史
