@@ -378,32 +378,68 @@ def minutes_between(hm1, hm2):
     return max(0, to_min(hm2) - to_min(hm1))
 
 
+def _to_min(hm):
+    h, m = hm.split(":")
+    return int(h) * 60 + int(m)
+
+
+# 全时段覆盖：每个时间点都能落到某个时段，不会出现"没匹配就默认夜宵"
+DAY_SLOTS = [
+    ("深夜", "23:30", "06:30", "食堂基本打烊，只剩小卖部与夜宵摊，别吃太撑"),
+    ("早餐", "06:30", "09:00", "早餐窗口全部开放，出餐最快"),
+    ("上午加餐", "09:00", "11:00", "正餐窗口还没全开，适合小吃或饮品垫一下"),
+    ("午餐", "11:00", "13:30", "正餐窗口全部开放，注意避开 12:00—12:30 的高峰"),
+    ("午间", "13:30", "14:00", "正餐收尾时段，部分窗口已关，可考虑轻食或小吃"),
+    ("下午茶", "14:00", "17:00", "适合饮品、甜品和小吃，正餐较少"),
+    ("晚餐", "17:00", "19:30", "正餐与面食都开放，是一天最全的时段"),
+    ("晚间加餐", "19:30", "21:00", "正餐陆续收摊，小吃与粉面还在营业"),
+    ("夜宵", "21:00", "23:30", "夜宵摊与小吃街营业，注意别吃太饱影响睡眠"),
+]
+
+SLOT_KINDS = {
+    "深夜": (["夜宵", "小吃"], ["粉面"]),
+    "早餐": (["早餐"], ["小吃", "饮品"]),
+    "上午加餐": (["小吃", "饮品"], ["甜品", "早餐"]),
+    "午餐": (["正餐", "盖饭", "面食", "套餐"], ["快餐", "粉面"]),
+    "午间": (["盖饭", "轻食"], ["饮品", "甜品", "小吃"]),
+    "下午茶": (["饮品", "甜品"], ["小吃", "轻食"]),
+    "晚餐": (["正餐", "盖饭", "粉面", "汤面", "面食"], ["轻食", "套餐"]),
+    "晚间加餐": (["小吃", "粉面"], ["饮品", "轻食", "甜品"]),
+    "夜宵": (["夜宵", "小吃"], ["粉面", "快餐"]),
+}
+
+
 def current_meal_slot(hm=None):
+    """按当前时间返回 (时段名, 开始, 结束, 提示)；全天 24 小时都有归属，不会误判。"""
     hm = hm or datetime.now().strftime("%H:%M")
-    for name, begin, end in MEAL_SLOTS:
-        if begin <= hm <= end:
-            return name, begin, end
-    return "夜宵", "21:00", "23:30"
+    now = _to_min(hm)
+    for name, begin, end, note in DAY_SLOTS:
+        b, e = _to_min(begin), _to_min(end)
+        if b > e:                      # 跨零点（23:30—06:30）
+            if now >= b or now <= e:
+                return name, begin, end, note
+        elif b <= now <= e:
+            return name, begin, end, note
+    # 理论上不会走到这里（表已覆盖 24h），兜底用早餐
+    return "早餐", "06:30", "09:00", "早餐窗口已开放"
 
 
 def recommend_meals(hm=None, taste="", budget=None, canteen="", avoid_wait=None,
-                    limit=3):
+                    limit=6):
     """本地推荐算法：时间匹配 + 口味匹配 + 预算惩罚 + 排队惩罚 + 评分加权。"""
-    slot, _, _ = current_meal_slot(hm)
-    slot_map = {"早餐": ["早餐"], "午餐": ["正餐", "盖饭", "面食", "快餐", "套餐"],
-                "下午茶": ["饮品", "甜品", "小吃"],
-                "晚餐": ["正餐", "盖饭", "粉面", "汤面", "轻食", "面食"],
-                "夜宵": ["夜宵", "小吃", "粉面"]}
-    wanted = slot_map.get(slot, [])
+    slot, _, _, note = current_meal_slot(hm)
+    primary, secondary = SLOT_KINDS.get(slot, ([], []))
     tastes = [t for t in re.split(r"[,，、\s]+", taste or "") if t]
 
     scored = []
     for name, canteen_name, window, price, kind, tags, wait, rating in DISHES:
         score = rating * 12.0
-        if kind in wanted:
-            score += 22
-        elif kind in ("早餐", "夜宵"):
-            score -= 6
+        if kind in primary:
+            score += 26          # 该时段的主力品类
+        elif kind in secondary:
+            score += 8           # 可以吃但不主推
+        else:
+            score -= 18          # 不合适就降权，仍可能出现在列表末尾
         score += sum(8 for t in tastes if t in tags)
         if canteen and canteen_name == canteen:
             score += 30
@@ -416,10 +452,10 @@ def recommend_meals(hm=None, taste="", budget=None, canteen="", avoid_wait=None,
                 score -= (price - budget) * 3.0
         if avoid_wait is not None:
             score -= max(0, wait - avoid_wait) * 2.2
-        if slot == "早餐" and kind != "早餐":
-            score -= 30
-        if slot == "夜宵" and kind not in ("夜宵", "小吃", "粉面"):
+        if slot in ("深夜", "夜宵") and kind not in ("夜宵", "小吃", "粉面", "快餐"):
             score -= 25
+        if slot == "早餐" and kind not in ("早餐", "小吃", "饮品"):
+            score -= 22
         scored.append({
             "name": name, "canteen": canteen_name, "window": window,
             "price": price, "kind": kind, "tags": tags, "wait": wait,
@@ -430,7 +466,7 @@ def recommend_meals(hm=None, taste="", budget=None, canteen="", avoid_wait=None,
     for i, item in enumerate(top, 1):
         item["rank"] = i
         item["reason"] = meal_reason(item, slot, tastes, budget)
-    return {"slot": slot, "list": top, "all_count": len(scored),
+    return {"slot": slot, "note": note, "list": top, "all_count": len(scored),
             "canteens": sorted({d[1] for d in DISHES})}
 
 
@@ -807,7 +843,8 @@ class Handler(BaseHTTPRequestHandler):
             canteen = q.get("canteen", "")
             avoid = int(prefs["avoid_wait"]) if prefs else 15
             data = recommend_meals(hm=q.get("hm"), taste=taste, budget=budget,
-                                   canteen=canteen, avoid_wait=avoid, limit=3)
+                                   canteen=canteen, avoid_wait=avoid,
+                                   limit=int(q.get("limit", "6")))
             data["ok"] = True
             data["taste"] = taste
             data["budget"] = budget
