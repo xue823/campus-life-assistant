@@ -1,0 +1,14 @@
+# 运行时与本地数据（不要提交）
+runtime/
+data/
+__pycache__/
+*.pyc
+*.log
+.idea/
+.vscode/
+.DS_Store
+
+# 打包产物
+*.zip
+_crop/
+_shots_tmp/
