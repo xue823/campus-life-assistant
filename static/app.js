@@ -264,8 +264,9 @@ function renderMeals() {
 
   $('#view').innerHTML = `
     <div class="hero meal">
-      <div class="hero-label">当前时段</div>
+      <div class="hero-label">当前时段 · ${esc(d.slot)}</div>
       <div class="hero-title">${esc(d.slot)}时间 · 共 ${d.all_count} 道菜参与推荐</div>
+      ${d.note ? `<div class="hero-meta"><span>💡 ${esc(d.note)}</span></div>` : ''}
       <div class="hero-meta"><span>按「时段匹配 + 口味 + 预算 + 排队时间」实时打分排序</span></div>
     </div>
     <div class="filters">
@@ -703,8 +704,12 @@ async function boot() {
   const me = await api('/api/me');
   if (!me || !me.ok) { location.href = '/'; return; }
   state.user = me.user;
-  $('#hello').textContent = `你好，${me.user.name}`;
-  $('#avatar').textContent = me.user.name.slice(0, 1);
+  // 注册时如果姓名填成了纯数字（学号），就别把学号当名字显示
+  const rawName = (me.user.name || '').trim();
+  const displayName = /^\d+$/.test(rawName) ? '同学' : rawName;
+  state.user.displayName = displayName;
+  $('#hello').textContent = `你好，${displayName}`;
+  $('#avatar').textContent = displayName === '同学' ? '同' : displayName.slice(0, 1);
   const quick = await api('/api/quick');
   if (quick) state.quick = quick;
   document.querySelectorAll('.tab').forEach((b) =>
