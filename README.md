@@ -67,7 +67,7 @@
 campus-life-assistant/
 ├── start.bat        # Windows 一键启动（优先用随包运行时，自动开浏览器）
 ├── server.py        # 单文件后端：路由 / 会话 / 注册 / 五个业务模块
-├── data_seed.py     # 种子数据：考核安排、22 道菜、11 条校园问答、学生信息
+├── data_seed.py     # 种子数据：考核安排、34 道菜、11 条校园问答、学生信息
 ├── runtime/python/  # 随包携带的 Python 3.12 精简运行时（免安装 Python）
 ├── templates/       # 两个页面：登录/注册页、应用外壳
 ├── static/          # app.js（原生 JS 单页逻辑）+ style.css（移动优先样式）
